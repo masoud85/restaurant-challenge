@@ -46,12 +46,20 @@ public class SeatingManager {
         if (groupsWaiting > 0) {
             addGroupToQueue(group, groupsWaiting + 1);
             return ApiResponse.builder()
-                    .message("There are " + groupsWaiting + " groups ahead of you")
+                    .message(String.format("There are %d groups ahead of you", groupsWaiting))
                     .statusCode(1210)
                     .data(groupsWaiting + 1)
                     .build();
         }
-        return assignTable(group);
+        return assignTable(group).orElseGet(() ->
+        {
+            addGroupToQueue(group, 1);
+            return ApiResponse.builder().message("Unfortunately there is not empty space now." +
+                            " You are the first group in the line.")
+                    .statusCode(1210)
+                    .data(1)
+                    .build();
+        });
     }
 
     private static void addGroupToQueue(CustomerGroup group, int groupsWaiting) {
@@ -59,8 +67,22 @@ public class SeatingManager {
         line.add(group);
     }
 
-    private ApiResponse assignTable(CustomerGroup group) {
+    private Optional<ApiResponse> assignTable(CustomerGroup group) {
         Optional<Table> availableTable = Optional.empty();
+        availableTable = findEmptyTable(group, availableTable);
+        if (availableTable.isPresent()) {
+            provideGroupWitTable(group, availableTable);
+            return Optional.of(ApiResponse.builder()
+                    .message("This group set at table " + availableTable.get().getTableNumber())
+                    .data(availableTable.get().getTableNumber())
+                    .statusCode(1200)
+                    .build());
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    private static Optional<Table> findEmptyTable(CustomerGroup group, Optional<Table> availableTable) {
         for (int i = group.getPeopleNumber(); i <= GROUPS_MAX_NUMBER; i++) {
             availableTable = Optional.ofNullable(inventory.get(i)).orElseGet(TreeSet::new).stream()
                     .filter(table -> table.getEmptySpace() >= group.getPeopleNumber())
@@ -69,25 +91,15 @@ public class SeatingManager {
                 break;
             }
         }
-        if (availableTable.isPresent()) {
-            settledGroup.add(group);
-            updateLine(group);
-            availableTable.get().setEmptySpace(availableTable.get().getEmptySpace() - group.getPeopleNumber());
-            group.setHasTable(true);
-            group.setTable(availableTable.get());
-            return ApiResponse.builder()
-                    .message("This group set at table " + availableTable.get().getTableNumber())
-                    .data(availableTable.get().getTableNumber())
-                    .statusCode(1200)
-                    .build();
-        } else {
-            addGroupToQueue(group, 1);
-            return ApiResponse.builder().message("Unfortunately there is not empty space now." +
-                            " This group is first in the line.")
-                    .statusCode(1210)
-                    .data(1)
-                    .build();
-        }
+        return availableTable;
+    }
+
+    private void provideGroupWitTable(CustomerGroup group, Optional<Table> availableTable) {
+        settledGroup.add(group);
+        updateLine(group);
+        availableTable.get().setEmptySpace(availableTable.get().getEmptySpace() - group.getPeopleNumber());
+        group.setHasTable(true);
+        group.setTable(availableTable.get());
     }
 
     private void updateLine(CustomerGroup readyCustomerGroup) {

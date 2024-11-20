@@ -138,7 +138,7 @@ class RestaurantChallengeApplicationTests {
         assertEquals(apiResponseResponseEntity.getStatusCode(), HttpStatus.OK);
         assertEquals(apiResponseResponseEntity.getBody().getData(), 1);
         assertEquals(apiResponseResponseEntity.getBody().getMessage(), "Unfortunately there is not empty space now." +
-                " This group is first in the line.");
+                " You are the first group in the line.");
         assertEquals(apiResponseResponseEntity.getBody().getStatusCode(), 1210);
     }
 
@@ -213,7 +213,7 @@ class RestaurantChallengeApplicationTests {
         assertEquals(apiResponseResponseEntity.getStatusCode(), HttpStatus.OK);
         assertEquals(apiResponseResponseEntity.getBody().getData(), 1);
         assertEquals(apiResponseResponseEntity.getBody().getMessage(), "Unfortunately there is not empty space now." +
-                " This group is first in the line.");
+                " You are the first group in the line.");
         assertEquals(apiResponseResponseEntity.getBody().getStatusCode(), 1210);
     }
 
@@ -233,7 +233,7 @@ class RestaurantChallengeApplicationTests {
 //        then: we get proper message and give them 2nd number in line
         assertEquals(apiResponseResponseEntity.getStatusCode(), HttpStatus.OK);
         assertEquals(apiResponseResponseEntity.getBody().getData(), 2);
-        assertEquals(apiResponseResponseEntity.getBody().getMessage(), "There are 1 groups ahead of you");
+        assertEquals(apiResponseResponseEntity.getBody().getMessage(), "There are " + ((int)apiResponseResponseEntity.getBody().getData() - 1) + " groups ahead of you");
         assertEquals(apiResponseResponseEntity.getBody().getStatusCode(), 1210);
     }
 
