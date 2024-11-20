@@ -2,6 +2,6 @@ package com.midokura.restaurant.exception;
 
 public class GroupHasAlreadyLeftException extends RuntimeException {
     public GroupHasAlreadyLeftException() {
-        super("Group has already gone.");
+        super("Either the group has already gone or it does not exist at all.");
     }
 }

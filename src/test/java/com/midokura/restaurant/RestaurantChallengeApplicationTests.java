@@ -116,7 +116,7 @@ class RestaurantChallengeApplicationTests {
                                 .uniqueName("group4")
                                 .build(), ApiResponse.class);
 
-//        then: we expect to get table 6 for them
+//        then: we expect to get table 7 for them
         assertEquals(apiResponseResponseEntity.getStatusCode(), HttpStatus.OK);
         assertEquals(apiResponseResponseEntity.getBody().getData(), 7);
     }
@@ -134,7 +134,7 @@ class RestaurantChallengeApplicationTests {
                                 .uniqueName("group5")
                                 .build(), ApiResponse.class);
 
-//        then: we expect to get table 6 for them
+//        then: we expect to put them in the line and give them number 1.
         assertEquals(apiResponseResponseEntity.getStatusCode(), HttpStatus.OK);
         assertEquals(apiResponseResponseEntity.getBody().getData(), 1);
         assertEquals(apiResponseResponseEntity.getBody().getMessage(), "Unfortunately there is not empty space now." +
@@ -173,15 +173,15 @@ class RestaurantChallengeApplicationTests {
                                 .uniqueName("group5")
                                 .build(), ApiResponse.class);
 
-//        then: we expect to get table 6 for them
+//        then: we expect to get table 7 for them
         assertEquals(apiResponseResponseEntity.getStatusCode(), HttpStatus.OK);
         assertEquals(apiResponseResponseEntity.getBody().getData(), 7);
     }
 
     @Test
     @Order(8)
-    void shouldReturnProperMessgeIfGroup4LeaveTwice() {
-//        given: table 7 is occupied by 6 people(group4)
+    void shouldReturnProperMessageIfGroup4LeaveTwice() {
+//        given: a non-existing or already left group is trying to leave
 
 //        when: group4 leave
         ResponseEntity<ApiResponse> apiResponseResponseEntity = testRestTemplate
@@ -190,9 +190,9 @@ class RestaurantChallengeApplicationTests {
                                 .uniqueName("group4")
                                 .build(), ApiResponse.class);
 
-//        then: we expect to get table 7 available again
+//        then: we to get a proper message
         assertEquals(apiResponseResponseEntity.getStatusCode(), HttpStatus.OK);
-        assertEquals(apiResponseResponseEntity.getBody().getMessage(), "Group has already gone.");
+        assertEquals(apiResponseResponseEntity.getBody().getMessage(), "Either the group has already gone or it does not exist at all.");
     }
 
     @Test
@@ -258,7 +258,7 @@ class RestaurantChallengeApplicationTests {
     @Test
     @Order(12)
     void locatingGroup4ShouldReturnNull() {
-//        given: group2 is still on table 2 from shouldReturnTable2For2People tests and they have not left yet.
+//        given: group4 left and when we locate them we get a null response.
 
 //        when: we check for their table number
         ResponseEntity<ApiResponse> apiResponseResponseEntity = testRestTemplate
